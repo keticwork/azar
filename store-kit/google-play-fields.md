@@ -44,7 +44,7 @@ https://keticwork.github.io/azar/privacy-policy.html
 - Collecte de donnees utilisateur : non.
 - Partage de donnees utilisateur : non.
 - Chiffrement en transit : non applicable, aucune donnee envoyee.
-- Suppression de donnees : donnees locales supprimables en retirant les images, en reinitialisant la session ou en desinstallant l'app.
+- Suppression de donnees : donnees locales supprimables depuis l'ecran Confidentialite de l'app, ou en desinstallant l'app.
 - Photos/images : acces galerie uniquement sur action utilisateur pour personnaliser la piece. Aucune image ne quitte l'appareil.
 
 ## Contenu sensible

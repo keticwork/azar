@@ -17,7 +17,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Azar utilise votre galerie uniquement pour personnaliser l'image de la piece.",
+          "photosPermission": "Azar utilise votre galerie uniquement pour personnaliser l'image de la pièce.",
           "cameraPermission": false,
           "microphonePermission": false
         }

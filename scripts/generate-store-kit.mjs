@@ -545,7 +545,7 @@ Coordonnees de contact :
 
 Remarques pour l'equipe Apple :
 
-Azar ne nécessite pas de compte utilisateur. L'application permet de lancer pile ou face, de personnaliser les libellés et d'ajouter localement des images aux deux faces de la pièce. Les images restent sur l'appareil et ne sont jamais envoyées à un serveur. L'app ne contient pas de publicité, pas d'analytics, pas d'achat intégré et aucune fonctionnalité de pari, mise, gain ou récompense.
+Azar ne nécessite pas de compte utilisateur. L'application permet de lancer pile ou face, de personnaliser les libellés et d'ajouter localement des images aux deux faces de la pièce. Les images restent sur l'appareil et ne sont jamais envoyées à un serveur. L'app permet aussi d'effacer les données locales depuis l'écran Confidentialité. Elle ne contient pas de publicité, pas d'analytics, pas d'achat intégré et aucune fonctionnalité de pari, mise, gain ou récompense.
 
 Publication :
 
@@ -570,6 +570,10 @@ Non. Azar ne suit pas les utilisateurs et n'utilise aucun identifiant publicitai
 ## Photos / galerie
 
 Usage local uniquement : l'utilisateur choisit une image pour personnaliser une face de la piece. L'image reste sur l'appareil et n'est pas envoyee.
+
+## Suppression locale
+
+Les reglages, images et statistiques locales peuvent etre effaces depuis l'ecran Confidentialite de l'app.
 
 ## Compte utilisateur
 
@@ -628,7 +632,7 @@ https://keticwork.github.io/azar/privacy-policy.html
 - Collecte de donnees utilisateur : non.
 - Partage de donnees utilisateur : non.
 - Chiffrement en transit : non applicable, aucune donnee envoyee.
-- Suppression de donnees : donnees locales supprimables en retirant les images, en reinitialisant la session ou en desinstallant l'app.
+- Suppression de donnees : donnees locales supprimables depuis l'ecran Confidentialite de l'app, ou en desinstallant l'app.
 - Photos/images : acces galerie uniquement sur action utilisateur pour personnaliser la piece. Aucune image ne quitte l'appareil.
 
 ## Contenu sensible

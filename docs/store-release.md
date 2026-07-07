@@ -234,7 +234,7 @@ Reponses conseillees pour la V1 actuelle :
 - Partage de donnees utilisateur : non.
 - Privacy policy : `https://keticwork.github.io/azar/privacy-policy.html`
 - Photos/images : l'app demande l'acces galerie uniquement pour une selection locale faite par l'utilisateur. Aucune image ne quitte l'appareil.
-- Suppression des donnees : aucune donnee serveur. Les donnees locales peuvent etre remises a zero dans l'app ou supprimees en desinstallant l'app.
+- Suppression des donnees : aucune donnee serveur. Les donnees locales peuvent etre effacees depuis l'ecran Confidentialite de l'app ou supprimees en desinstallant l'app.
 
 Toujours revoir ces reponses si on ajoute analytics, publicite, compte utilisateur, backend, crash reporting ou paiement.
 

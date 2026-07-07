@@ -14,6 +14,10 @@ Non. Azar ne suit pas les utilisateurs et n'utilise aucun identifiant publicitai
 
 Usage local uniquement : l'utilisateur choisit une image pour personnaliser une face de la piece. L'image reste sur l'appareil et n'est pas envoyee.
 
+## Suppression locale
+
+Les reglages, images et statistiques locales peuvent etre effaces depuis l'ecran Confidentialite de l'app.
+
 ## Compte utilisateur
 
 Aucun compte utilisateur.

@@ -44,6 +44,7 @@ const MAX_HISTORY_ITEMS = 12;
 const MAX_CUSTOM_LABEL_LENGTH = 18;
 const SETTINGS_STORAGE_KEY = 'azar:coin-settings:v1';
 const COIN_IMAGE_DIRECTORY_NAME = 'azar-coin-images';
+const APP_VERSION = '1.0.0';
 
 type StoredCoinSettings = {
   labels?: Partial<CoinLabels>;
@@ -342,6 +343,49 @@ export default function App() {
     setHistory([]);
     setSelectedPrediction(null);
     flipProgress.setValue(0);
+  };
+
+  const clearLocalData = () => {
+    if (isFlipping) {
+      Alert.alert('Lancer en cours', 'Attends la fin du lancer avant de réinitialiser Azar.');
+      return;
+    }
+
+    Alert.alert(
+      'Effacer les données locales',
+      'Cette action remet Azar à zéro sur cet appareil : historique, prédiction, libellés et images personnalisées.',
+      [
+        {
+          style: 'cancel',
+          text: 'Annuler',
+        },
+        {
+          onPress: async () => {
+            try {
+              await removeUnusedManagedImages(coinImages, {});
+              await AsyncStorage.removeItem(SETTINGS_STORAGE_KEY);
+
+              setFaceLabels(DEFAULT_FACE_LABELS);
+              setDraftLabels(DEFAULT_FACE_LABELS);
+              setCoinImages({});
+              setDraftImages({});
+              resetSession();
+              setIsInfoVisible(false);
+
+              Alert.alert('Azar est réinitialisée', 'Les données locales ont été effacées.');
+            } catch (error) {
+              Alert.alert(
+                'Réinitialisation impossible',
+                'Azar n’a pas pu effacer toutes les données locales. Réessaie dans quelques instants.',
+              );
+              console.warn('Unable to clear Azar local data', error);
+            }
+          },
+          style: 'destructive',
+          text: 'Effacer',
+        },
+      ],
+    );
   };
 
   const pileRatio = stats.total ? Math.round((stats.pile / stats.total) * 100) : 0;
@@ -898,6 +942,18 @@ export default function App() {
                 Si une image est choisie pour la pièce, elle est utilisée
                 localement pour l'affichage et n'est jamais envoyée.
               </Text>
+              <Text style={styles.modalMeta}>Version {APP_VERSION}</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Effacer les données locales"
+                onPress={clearLocalData}
+                style={({ pressed }) => [
+                  styles.dangerButton,
+                  pressed ? styles.dangerButtonPressed : null,
+                ]}
+              >
+                <Text style={styles.dangerButtonText}>Effacer les données locales</Text>
+              </Pressable>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Fermer les informations"
@@ -991,7 +1047,7 @@ function CoinSide({
             style={[
               styles.coinLabel,
               imageUri ? styles.coinLabelOnImage : null,
-              { fontSize: size * 0.155 },
+              { fontSize: size * (imageUri ? 0.105 : 0.155) },
             ]}
           >
             {label}
@@ -1449,6 +1505,14 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 10,
   },
+  modalMeta: {
+    color: '#667085',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0,
+    marginBottom: 12,
+    marginTop: 2,
+  },
   inputGroup: {
     marginBottom: 14,
   },
@@ -1578,6 +1642,27 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 0,
+  },
+  dangerButton: {
+    alignItems: 'center',
+    backgroundColor: '#FFF6F4',
+    borderColor: '#F4B8AE',
+    borderRadius: 8,
+    borderWidth: 1,
+    justifyContent: 'center',
+    marginBottom: 10,
+    minHeight: 46,
+    paddingHorizontal: 16,
+    width: '100%',
+  },
+  dangerButtonPressed: {
+    backgroundColor: '#FFE7E1',
+  },
+  dangerButtonText: {
+    color: '#9F2D20',
+    fontSize: 15,
     fontWeight: '900',
     letterSpacing: 0,
   },

@@ -52,7 +52,7 @@ Coordonnees de contact :
 
 Remarques pour l'equipe Apple :
 
-Azar ne nécessite pas de compte utilisateur. L'application permet de lancer pile ou face, de personnaliser les libellés et d'ajouter localement des images aux deux faces de la pièce. Les images restent sur l'appareil et ne sont jamais envoyées à un serveur. L'app ne contient pas de publicité, pas d'analytics, pas d'achat intégré et aucune fonctionnalité de pari, mise, gain ou récompense.
+Azar ne nécessite pas de compte utilisateur. L'application permet de lancer pile ou face, de personnaliser les libellés et d'ajouter localement des images aux deux faces de la pièce. Les images restent sur l'appareil et ne sont jamais envoyées à un serveur. L'app permet aussi d'effacer les données locales depuis l'écran Confidentialité. Elle ne contient pas de publicité, pas d'analytics, pas d'achat intégré et aucune fonctionnalité de pari, mise, gain ou récompense.
 
 Publication :
 
