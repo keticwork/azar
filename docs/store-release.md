@@ -54,6 +54,14 @@ npm run build:preview:android
 
 Resultat attendu : EAS fournit une URL pour telecharger un APK installable sur Android.
 
+Si EAS demande :
+
+```txt
+Generate a new Android Keystore?
+```
+
+Repondre `yes` pour le premier build Android de l'app. Garder ensuite les credentials Android distants geres par Expo. Ne pas regenerer un nouveau keystore pour une app deja publiee, car Google Play attend la meme cle de signature pour les mises a jour.
+
 A verifier sur telephone Android :
 
 - l'app s'installe hors Expo Go ;

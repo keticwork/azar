@@ -2,6 +2,7 @@
   "expo": {
     "name": "Azar",
     "slug": "azar",
+    "owner": "ketic",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,7 +35,7 @@
       "package": "com.keticwork.azar",
       "versionCode": 1,
       "permissions": [
-        "VIBRATE"
+        "android.permission.VIBRATE"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#F5F7FA",
@@ -46,6 +47,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "65471fa7-981b-407b-a22d-a0b1a0b76406"
+      }
     }
   }
 }

@@ -809,35 +809,49 @@ export default function App() {
               </ScrollView>
 
               <View style={styles.modalActions}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Annuler la personnalisation"
-                  disabled={isSavingSettings}
-                  onPress={() => setIsSettingsVisible(false)}
-                  style={({ pressed }) => [
-                    styles.secondaryModalButton,
-                    pressed ? styles.secondaryModalButtonPressed : null,
-                    isSavingSettings ? styles.secondaryModalButtonDisabled : null,
-                  ]}
-                >
-                  <Text style={styles.secondaryModalButtonText}>Annuler</Text>
-                </Pressable>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Revenir aux libellés par défaut"
-                  disabled={isSavingSettings}
-                  onPress={() => {
-                    setDraftLabels(DEFAULT_FACE_LABELS);
-                    setDraftImages({});
-                  }}
-                  style={({ pressed }) => [
-                    styles.secondaryModalButton,
-                    pressed ? styles.secondaryModalButtonPressed : null,
-                    isSavingSettings ? styles.secondaryModalButtonDisabled : null,
-                  ]}
-                >
-                  <Text style={styles.secondaryModalButtonText}>Défaut</Text>
-                </Pressable>
+                <View style={styles.secondaryModalActions}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Annuler la personnalisation"
+                    disabled={isSavingSettings}
+                    onPress={() => setIsSettingsVisible(false)}
+                    style={({ pressed }) => [
+                      styles.secondaryModalButton,
+                      pressed ? styles.secondaryModalButtonPressed : null,
+                      isSavingSettings ? styles.secondaryModalButtonDisabled : null,
+                    ]}
+                  >
+                    <Text
+                      adjustsFontSizeToFit
+                      numberOfLines={1}
+                      style={styles.secondaryModalButtonText}
+                    >
+                      Annuler
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Revenir aux libellés par défaut"
+                    disabled={isSavingSettings}
+                    onPress={() => {
+                      setDraftLabels(DEFAULT_FACE_LABELS);
+                      setDraftImages({});
+                    }}
+                    style={({ pressed }) => [
+                      styles.secondaryModalButton,
+                      pressed ? styles.secondaryModalButtonPressed : null,
+                      isSavingSettings ? styles.secondaryModalButtonDisabled : null,
+                    ]}
+                  >
+                    <Text
+                      adjustsFontSizeToFit
+                      numberOfLines={1}
+                      style={styles.secondaryModalButtonText}
+                    >
+                      Défaut
+                    </Text>
+                  </Pressable>
+                </View>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Enregistrer la personnalisation"
@@ -845,12 +859,15 @@ export default function App() {
                   onPress={saveLabels}
                   style={({ pressed }) => [
                     styles.modalButton,
-                    styles.modalButtonFlex,
                     pressed ? styles.modalButtonPressed : null,
                     isSavingSettings ? styles.modalButtonDisabled : null,
                   ]}
                 >
-                  <Text style={styles.modalButtonText}>
+                  <Text
+                    adjustsFontSizeToFit
+                    numberOfLines={1}
+                    style={styles.modalButtonText}
+                  >
                     {isSavingSettings ? '...' : 'Enregistrer'}
                   </Text>
                 </Pressable>
@@ -1558,22 +1575,21 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   modalActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 10,
     marginTop: 4,
+  },
+  secondaryModalActions: {
+    flexDirection: 'row',
+    gap: 10,
   },
   modalButton: {
     alignItems: 'center',
     backgroundColor: '#15202B',
     borderRadius: 8,
     justifyContent: 'center',
-    marginTop: 8,
     minHeight: 48,
-  },
-  modalButtonFlex: {
-    flex: 1,
-    marginTop: 0,
+    paddingHorizontal: 18,
+    width: '100%',
   },
   modalButtonPressed: {
     opacity: 0.88,
@@ -1592,7 +1608,7 @@ const styles = StyleSheet.create({
     borderColor: '#CDD5DF',
     borderRadius: 8,
     borderWidth: 1,
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     minHeight: 48,
     paddingHorizontal: 15,
