@@ -21,6 +21,7 @@ Azar est une mini-application mobile Expo / React Native. La V1 contient une exp
 - Aucune publicite, analytics ou collecte de donnees.
 - L'acces galerie sert uniquement a choisir une image pour la piece.
 - Les images choisies sont copiees dans le stockage prive de l'app et ne sont pas envoyees.
+- Une politique de confidentialite statique est preparee dans `docs/privacy-policy.html`.
 
 ## Commandes
 
