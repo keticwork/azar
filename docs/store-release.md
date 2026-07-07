@@ -56,6 +56,8 @@ Resultat attendu : EAS fournit une URL pour telecharger un APK installable sur A
 
 Ce lien est un artefact de test interne. Il expire apres quelques jours et ne doit pas etre utilise comme lien public sur un site web. Le lien public durable viendra de Google Play apres publication.
 
+Validation Azar du 7 juillet 2026 : le lien direct APK a permis de telecharger, installer et ouvrir l'app sur Android. L'avertissement Android indiquant que le developpeur est inconnu est normal pour un APK installe hors Google Play. En preview, utiliser `Installer quand meme` uniquement sur nos propres builds EAS.
+
 Si EAS demande :
 
 ```txt
