@@ -194,6 +194,199 @@ Dans App Store Connect, pour la V1 :
 - `UGS / SKU` : `com.keticwork.azar`
 - Captures iPhone : utiliser de preference des captures reelles de l'app ; des visuels de secours sont disponibles dans `store-kit/images/apple-app-store/`.
 
+## Journal questions/reponses rencontrees
+
+Cette section garde les prompts reels vus pendant la distribution Azar. Elle servira a produire ensuite un guide general plus digeste pour les prochaines mini-apps.
+
+### Expo/EAS
+
+Question :
+
+```txt
+EAS project not configured. Would you like to automatically create an EAS project?
+```
+
+Reponse : `yes` pour la premiere configuration EAS d'une nouvelle app.
+
+Pourquoi : cela cree le projet Expo/EAS et ajoute `extra.eas.projectId` dans `app.json`. Committer ensuite `app.json`.
+
+Question :
+
+```txt
+Using remote Android credentials (Expo server)
+Generate a new Android Keystore?
+```
+
+Reponse : `yes` uniquement au premier build Android de l'app.
+
+Pourquoi : Google Play exigera ensuite la meme cle pour les mises a jour. Ne pas regenerer de keystore apres publication.
+
+Question :
+
+```txt
+The package @expo/ngrok is required to use tunnels, would you like to install it globally?
+```
+
+Reponse : `yes` si Expo Go ne marche pas en LAN et que le mode tunnel est necessaire.
+
+Pourquoi : le tunnel contourne les problemes Wi-Fi/box/firewall. Il sert au developpement, pas a la distribution store.
+
+### iOS preview/ad hoc
+
+Question :
+
+```txt
+You're inside the project directory. Would you like to use the ketic account?
+```
+
+Reponse : `yes`.
+
+Pourquoi : l'app Azar est rattachee au compte Expo `ketic`.
+
+Question :
+
+```txt
+How would you like to register your devices?
+```
+
+Reponse : `Website - generates a registration URL to be opened on your devices`.
+
+Pourquoi : c'est le plus simple pour enregistrer l'iPhone via QR code/profil iOS.
+
+Question :
+
+```txt
+Do you want to log in to your Apple account?
+```
+
+Reponse : `yes`.
+
+Pourquoi : EAS peut creer et valider les certificats/profils Apple automatiquement.
+
+Question :
+
+```txt
+Generate a new Apple Distribution Certificate?
+```
+
+Reponse : `yes` au premier build iOS de l'app si aucun certificat utilisable n'existe.
+
+Pourquoi : EAS cree un certificat Apple Distribution pour signer les builds.
+
+Question :
+
+```txt
+Select devices for the ad hoc build
+```
+
+Reponse : selectionner l'iPhone voulu avec `Space`, puis valider avec `Return`.
+
+Pourquoi : un build iOS preview/ad hoc ne s'installe que sur les appareils inclus dans le provisioning profile.
+
+Message iPhone :
+
+```txt
+Mode developpeur requis
+```
+
+Action : activer `Reglages > Confidentialite et securite > Mode developpeur`, puis redemarrer l'iPhone.
+
+Pourquoi : requis pour les builds internes/ad hoc. Pas requis pour les utilisateurs finaux via TestFlight/App Store.
+
+### iOS production/App Store
+
+Question :
+
+```txt
+Reuse this distribution certificate?
+```
+
+Reponse : `yes` si le certificat est deja lie a `@ketic/azar`.
+
+Pourquoi : reutiliser un certificat valide evite de multiplier les credentials Apple sans raison.
+
+Question :
+
+```txt
+Generate a new Apple Provisioning Profile?
+```
+
+Reponse : `yes` si EAS n'a pas encore de provisioning profile App Store valide pour `com.keticwork.azar`.
+
+Pourquoi : un build production App Store a besoin d'un profil de signature different du profil ad hoc/preview.
+
+Question App Store Connect :
+
+```txt
+UGS
+```
+
+Reponse conseillee : `com.keticwork.azar`.
+
+Pourquoi : UGS/SKU est un identifiant interne stable pour App Store Connect. Il peut etre le bundle identifier ; il n'est pas affiche aux utilisateurs.
+
+Observation App Store Connect :
+
+```txt
+Identifiant de lot tres long dans la liste
+```
+
+Reponse : normal si Apple affiche aussi le nom interne du Bundle ID avant `com.keticwork.azar`.
+
+Point important : si un build est en cours mais que le code doit changer, faire `Ctrl+C`, corriger, verifier, commit/push, puis relancer le build. Ne pas envoyer a Apple un binaire deja obsolete.
+
+### Apple contrats/conformite
+
+Message :
+
+```txt
+Apple Developer Program License Agreement Updated
+```
+
+Action : aller sur https://developer.apple.com/account et accepter le nouveau contrat avec le compte titulaire.
+
+Message :
+
+```txt
+Developers must provide their trader status to submit new apps or app updates for distribution in the European Union.
+```
+
+Action : dans App Store Connect, renseigner la conformite DSA. Pour un auto-entrepreneur publiant dans le cadre de son activite, traiter le statut comme professionnel/commercant et fournir un justificatif officiel si Apple le demande.
+
+Note : le contrat payant/IAP n'est pas necessaire pour Azar V1 si l'app reste gratuite et sans achats integres.
+
+### Fiche store
+
+Question :
+
+```txt
+Faut-il parler des futurs modes des/cartes dans la description?
+```
+
+Reponse : non pour la V1.
+
+Pourquoi : Apple/Google veulent que la fiche de l'app decrive ce qui est reellement disponible dans le build soumis. On pourra elargir la description quand les modes des/cartes existeront.
+
+Question :
+
+```txt
+Connexion requise dans les informations de verification Apple?
+```
+
+Reponse : decocher.
+
+Pourquoi : Azar n'a aucun compte ni ecran de connexion.
+
+Question :
+
+```txt
+Lien EAS APK/IPA utilisable comme lien public?
+```
+
+Reponse : non.
+
+Pourquoi : les artefacts EAS preview sont temporaires et internes. Les liens publics durables viendront des stores apres publication.
+
 ## Google Play - fiche conseillee
 
 Nom : `Azar`
