@@ -7,6 +7,9 @@ Ce document sert de base pour publier Azar sur Google Play et Apple App Store. I
 ## Etat actuel
 
 - App Expo SDK 54.
+- Depot GitHub : https://github.com/keticwork/azar
+- Projet EAS : `@ketic/azar`
+- EAS projectId : `65471fa7-981b-407b-a22d-a0b1a0b76406`
 - Identifiants natifs :
   - iOS : `com.keticwork.azar`
   - Android : `com.keticwork.azar`
@@ -20,22 +23,24 @@ Ce document sert de base pour publier Azar sur Google Play et Apple App Store. I
 
 ## Etape 1 - Connexion Expo/EAS
 
-Sur cette machine, EAS CLI repond mais le compte Expo n'est pas encore connecte.
+Sur cette machine, la connexion EAS a ete validee avec le compte Expo `ketic` / `keticwork@gmail.com`.
 
 ```sh
 npm run eas:login
 npm run eas:whoami
 ```
 
-Quand `whoami` affiche le nom du compte Expo, continuer.
+Quand `whoami` affiche le nom du compte Expo, continuer. Si le terminal repond deja `ketic`, ne pas recreer de compte.
 
 ## Etape 2 - Lier le projet EAS
+
+Azar est deja lie au projet EAS `@ketic/azar`.
 
 ```sh
 npm run eas:configure
 ```
 
-Cette commande peut ajouter un `extra.eas.projectId` dans `app.json`. Si c'est le cas :
+Pour une nouvelle app, cette commande peut ajouter un `extra.eas.projectId` dans `app.json`. Si c'est le cas :
 
 ```sh
 git status -sb
@@ -95,6 +100,49 @@ npx eas-cli device:create
 npm run build:preview:ios
 ```
 
+Validation Azar du 7 juillet 2026 :
+
+- Apple Developer Program actif sur le compte Apple `kiapcn@icloud.com`.
+- Team Apple utilisee : `kevin pichon (X7667K9QA6)`.
+- Provider Apple : `kevin pichon (128819479)`.
+- Appareil enregistre via `npx eas-cli device:create` :
+  - `00008030-00045091026B802E (iPhone 11)`
+- Bundle identifier `com.keticwork.azar` enregistre avec succes.
+- Apple Distribution Certificate cree/gere par EAS.
+- Provisioning profile ad hoc cree pour l'iPhone 11.
+- Build iOS preview termine avec succes :
+  - URL : https://expo.dev/accounts/ketic/projects/azar/builds/7e9bcb36-c5f1-491f-80c9-cfcce970c82d
+  - Commit : `dd1cff3`
+  - Profil : `preview`
+- Installation et ouverture validees sur iPhone 11 apres activation du Mode developpeur iOS.
+
+Reponses donnees pendant le flow iOS :
+
+- `Would you like to use the ketic account?` : `yes`
+- Apple ID : compte Apple Developer du titulaire.
+- Methode d'enregistrement appareil : `Website - generates a registration URL to be opened on your devices`
+- Installer le profil iOS propose par Expo sur l'iPhone.
+- Si EAS demande de selectionner l'appareil ad hoc : selectionner l'iPhone voulu avec `Space`, puis `Return`.
+- `Do you want to log in to your Apple account?` : `yes`
+- `Generate a new Apple Distribution Certificate?` : `yes` au premier build iOS de l'app.
+- Laisser EAS gerer les credentials iOS distants.
+
+Points Apple regles pendant cette etape :
+
+- Le nouveau contrat Apple Developer Program a ete accepte dans Apple Developer.
+- Le contrat gratuit App Store Connect est actif.
+- Le statut DSA / trader UE a ete renseigne comme professionnel/commercant pour l'activite auto-entrepreneur.
+- Un justificatif d'entreprise officiel a ete envoye a Apple ; au moment de cette note, la conformite DSA apparait `En cours de verification`.
+- Le contrat payant / achats integres est ignore pour Azar V1, car l'app est gratuite et sans IAP.
+
+Notes importantes :
+
+- Un build iOS preview ad hoc ne s'installe que sur les appareils enregistres dans le provisioning profile.
+- Si on ajoute un autre iPhone, il faut l'enregistrer puis refaire un build iOS preview.
+- Sur iPhone, iOS peut demander d'activer `Reglages > Confidentialite et securite > Mode developpeur`. C'est normal pour un build interne hors App Store/TestFlight.
+- Le Mode developpeur n'est pas necessaire pour les futurs utilisateurs via App Store ou TestFlight.
+- Le lien EAS est un artefact interne temporaire, pas un lien public de distribution.
+
 Alternative plus proche de la vraie distribution : creer l'app dans App Store Connect, faire un build iOS production, puis l'envoyer vers TestFlight.
 
 ## Etape 5 - Build production Android
@@ -117,6 +165,7 @@ Prerequis :
 - App privacy remplie.
 - Age rating rempli.
 - Screenshots ajoutes.
+- Conformite DSA validee ou au moins non bloquante dans App Store Connect.
 
 Puis :
 
