@@ -840,7 +840,7 @@ export default function App() {
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Enregistrer les libellés"
+                  accessibilityLabel="Enregistrer la personnalisation"
                   disabled={isSavingSettings}
                   onPress={saveLabels}
                   style={({ pressed }) => [

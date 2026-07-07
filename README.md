@@ -87,7 +87,11 @@ Si le QR code n'est pas visible, ouvrir manuellement l'URL Expo du projet dans E
 Les builds store passeront par EAS Build.
 
 ```sh
+npm run eas:login
+npm run eas:whoami
+npm run eas:configure
 npm run build:preview:android
+npm run build:preview:ios
 npm run build:android
 npm run build:ios
 ```
@@ -100,6 +104,8 @@ npm run submit:ios
 ```
 
 Avant la soumission, il faudra connecter Expo/EAS aux comptes Apple Developer et Google Play Console. L'application est configuree avec les identifiants natifs `com.keticwork.azar`.
+
+La checklist detaillee de distribution est dans `docs/store-release.md`.
 
 ## Assets
 
