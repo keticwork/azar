@@ -67,6 +67,10 @@ function getCoinImageDirectory() {
 }
 
 function getImageExtension(uri: string) {
+  if (uri.startsWith('data:image/')) {
+    return 'jpg';
+  }
+
   const cleanUri = uri.split('?')[0] ?? uri;
   const extension = cleanUri.match(/\.([a-zA-Z0-9]+)$/)?.[1]?.toLowerCase();
 
@@ -82,17 +86,26 @@ function isManagedCoinImage(uri: string) {
 async function copyImageToAppStorage(uri: string, face: CoinFace) {
   const directory = getCoinImageDirectory();
 
-  if (!directory || isManagedCoinImage(uri)) {
+  if (!directory || isManagedCoinImage(uri) || uri.startsWith('data:')) {
     return uri;
   }
 
-  await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
+  try {
+    const directoryInfo = await FileSystem.getInfoAsync(directory);
 
-  const extension = getImageExtension(uri);
-  const destination = `${directory}${face}-${Date.now()}.${extension}`;
-  await FileSystem.copyAsync({ from: uri, to: destination });
+    if (!directoryInfo.exists) {
+      await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
+    }
 
-  return destination;
+    const extension = getImageExtension(uri);
+    const destination = `${directory}${face}-${Date.now()}.${extension}`;
+    await FileSystem.copyAsync({ from: uri, to: destination });
+
+    return destination;
+  } catch (error) {
+    console.warn('Unable to copy Azar coin image, keeping original URI', error);
+    return uri;
+  }
 }
 
 async function prepareCoinImages(images: CoinImages) {
@@ -143,9 +156,9 @@ export default function App() {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
-  const coinSpin = useRef(new Animated.Value(0)).current;
+  const [visibleCoinFace, setVisibleCoinFace] = useState<CoinFace>('pile');
   const flipProgress = useRef(new Animated.Value(0)).current;
-  const rotationDegrees = useRef(0);
+  const flipInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const isCompactHeight = height < 700;
   const coinSize = Math.min(isCompactHeight ? 192 : 224, width - 78);
   const coinInnerSize = Math.max(coinSize - 40, 140);
@@ -199,6 +212,14 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (flipInterval.current) {
+        clearInterval(flipInterval.current);
+      }
+    };
+  }, []);
+
   const stats = useMemo(() => {
     let pile = 0;
     let predictionTotal = 0;
@@ -238,14 +259,19 @@ export default function App() {
     };
   }, [history]);
 
-  const coinRotation = coinSpin.interpolate({
+  const coinRotation = flipProgress.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '1deg'],
+    outputRange: ['0deg', '720deg'],
   });
 
-  const coinScale = flipProgress.interpolate({
-    inputRange: [0, 0.45, 1],
-    outputRange: [1, 0.94, 1],
+  const coinScaleX = flipProgress.interpolate({
+    inputRange: [0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72, 0.84, 1],
+    outputRange: [1, 0.18, 1, 0.18, 1, 0.18, 1, 0.18, 1],
+  });
+
+  const coinScaleY = flipProgress.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 1.04, 1],
   });
 
   const flipCoin = () => {
@@ -255,37 +281,37 @@ export default function App() {
 
     const nextFace: CoinFace = Math.random() < 0.5 ? 'pile' : 'face';
     const activePrediction = selectedPrediction;
-    const targetFaceDegrees = nextFace === 'pile' ? 0 : 180;
-    const currentDegrees = rotationDegrees.current;
-    const currentFaceDegrees = ((currentDegrees % 360) + 360) % 360;
-    const deltaToTarget = (targetFaceDegrees - currentFaceDegrees + 360) % 360;
-    const nextRotationDegrees = currentDegrees + 1440 + deltaToTarget;
-
     setIsFlipping(true);
+    setVisibleCoinFace(currentFace);
     Vibration.vibrate(16);
     flipProgress.setValue(0);
 
-    Animated.parallel([
-      Animated.timing(coinSpin, {
-        toValue: nextRotationDegrees,
-        duration: 920,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(flipProgress, {
-        toValue: 1,
-        duration: 920,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(({ finished }) => {
+    if (flipInterval.current) {
+      clearInterval(flipInterval.current);
+    }
+
+    flipInterval.current = setInterval(() => {
+      setVisibleCoinFace((face) => (face === 'pile' ? 'face' : 'pile'));
+    }, 96);
+
+    Animated.timing(flipProgress, {
+      toValue: 1,
+      duration: 960,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (flipInterval.current) {
+        clearInterval(flipInterval.current);
+        flipInterval.current = null;
+      }
+
       if (!finished) {
         setIsFlipping(false);
         return;
       }
 
-      rotationDegrees.current = nextRotationDegrees;
       setCurrentFace(nextFace);
+      setVisibleCoinFace(nextFace);
       setHistory((items) => [
         { id: Date.now(), face: nextFace, prediction: activePrediction },
         ...items,
@@ -296,10 +322,9 @@ export default function App() {
 
   const resetSession = () => {
     setCurrentFace('pile');
+    setVisibleCoinFace('pile');
     setHistory([]);
     setSelectedPrediction(null);
-    rotationDegrees.current = 0;
-    coinSpin.setValue(0);
     flipProgress.setValue(0);
   };
 
@@ -363,15 +388,22 @@ export default function App() {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
+      base64: true,
       mediaTypes: ['images'],
-      quality: 0.86,
+      quality: 0.58,
       selectionLimit: 1,
     });
 
-    if (!result.canceled && result.assets[0]?.uri) {
+    const asset = result.canceled ? null : result.assets[0];
+
+    if (asset?.uri) {
+      const imageUri = asset.base64
+        ? `data:image/jpeg;base64,${asset.base64}`
+        : asset.uri;
+
       setDraftImages((images) => ({
         ...images,
-        [face]: result.assets[0].uri,
+        [face]: imageUri,
       }));
     }
   };
@@ -426,7 +458,7 @@ export default function App() {
 
           <View style={styles.coinSection}>
             <Animated.View
-              accessibilityLabel={`Pièce, résultat actuel ${faceLabels[currentFace]}`}
+              accessibilityLabel={`Pièce, face visible ${faceLabels[visibleCoinFace]}`}
               style={[
                 styles.coin,
                 {
@@ -434,26 +466,19 @@ export default function App() {
                   height: coinSize,
                   transform: [
                     { perspective: 900 },
-                    { rotateY: coinRotation },
-                    { scale: coinScale },
+                    { rotateZ: coinRotation },
+                    { scaleX: coinScaleX },
+                    { scaleY: coinScaleY },
                   ],
                   width: coinSize,
                 },
               ]}
             >
               <CoinSide
-                face="pile"
-                imageUri={coinImages.pile}
+                face={visibleCoinFace}
+                imageUri={coinImages[visibleCoinFace]}
                 innerSize={coinInnerSize}
-                label={faceLabels.pile}
-                size={coinSize}
-              />
-              <CoinSide
-                face="face"
-                imageUri={coinImages.face}
-                innerSize={coinInnerSize}
-                isBack
-                label={faceLabels.face}
+                label={faceLabels[visibleCoinFace]}
                 size={coinSize}
               />
             </Animated.View>
@@ -648,110 +673,117 @@ export default function App() {
             <View style={styles.modalPanel}>
               <Text style={styles.modalTitle}>Personnalisation</Text>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Face pile</Text>
-                <TextInput
-                  autoCapitalize="words"
-                  maxLength={MAX_CUSTOM_LABEL_LENGTH}
-                  onChangeText={(value) =>
-                    setDraftLabels((labels) => ({ ...labels, pile: value }))
-                  }
-                  placeholder={DEFAULT_FACE_LABELS.pile}
-                  returnKeyType="next"
-                  selectTextOnFocus
-                  style={styles.textInput}
-                  value={draftLabels.pile}
-                />
-              </View>
+              <ScrollView
+                contentContainerStyle={styles.settingsScrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                style={styles.settingsScroll}
+              >
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Face pile</Text>
+                  <TextInput
+                    autoCapitalize="words"
+                    maxLength={MAX_CUSTOM_LABEL_LENGTH}
+                    onChangeText={(value) =>
+                      setDraftLabels((labels) => ({ ...labels, pile: value }))
+                    }
+                    placeholder={DEFAULT_FACE_LABELS.pile}
+                    returnKeyType="next"
+                    selectTextOnFocus
+                    style={styles.textInput}
+                    value={draftLabels.pile}
+                  />
+                </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Face face</Text>
-                <TextInput
-                  autoCapitalize="words"
-                  maxLength={MAX_CUSTOM_LABEL_LENGTH}
-                  onChangeText={(value) =>
-                    setDraftLabels((labels) => ({ ...labels, face: value }))
-                  }
-                  placeholder={DEFAULT_FACE_LABELS.face}
-                  returnKeyType="done"
-                  selectTextOnFocus
-                  style={styles.textInput}
-                  value={draftLabels.face}
-                />
-              </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Face face</Text>
+                  <TextInput
+                    autoCapitalize="words"
+                    maxLength={MAX_CUSTOM_LABEL_LENGTH}
+                    onChangeText={(value) =>
+                      setDraftLabels((labels) => ({ ...labels, face: value }))
+                    }
+                    placeholder={DEFAULT_FACE_LABELS.face}
+                    returnKeyType="done"
+                    selectTextOnFocus
+                    style={styles.textInput}
+                    value={draftLabels.face}
+                  />
+                </View>
 
-              <View style={styles.imageSettings}>
-                {COIN_FACES.map((face) => {
-                  const label = normalizeLabel(
-                    draftLabels[face],
-                    DEFAULT_FACE_LABELS[face],
-                  );
-                  const imageUri = draftImages[face];
+                <View style={styles.imageSettings}>
+                  {COIN_FACES.map((face) => {
+                    const label = normalizeLabel(
+                      draftLabels[face],
+                      DEFAULT_FACE_LABELS[face],
+                    );
+                    const imageUri = draftImages[face];
 
-                  return (
-                    <View key={face} style={styles.imageSettingRow}>
-                      <View style={styles.imageSettingPreview}>
-                        {imageUri ? (
-                          <Image
-                            source={{ uri: imageUri }}
-                            style={styles.imageSettingPreviewImage}
-                          />
-                        ) : (
-                          <Text style={styles.imageSettingPreviewText}>
-                            {getCoinInitial(label)}
+                    return (
+                      <View key={face} style={styles.imageSettingRow}>
+                        <View style={styles.imageSettingPreview}>
+                          {imageUri ? (
+                            <Image
+                              source={{ uri: imageUri }}
+                              style={styles.imageSettingPreviewImage}
+                            />
+                          ) : (
+                            <Text style={styles.imageSettingPreviewText}>
+                              {getCoinInitial(label)}
+                            </Text>
+                          )}
+                        </View>
+                        <View style={styles.imageSettingActions}>
+                          <Text
+                            adjustsFontSizeToFit
+                            numberOfLines={1}
+                            style={styles.imageSettingLabel}
+                          >
+                            {label}
                           </Text>
-                        )}
-                      </View>
-                      <View style={styles.imageSettingActions}>
-                        <Text
-                          adjustsFontSizeToFit
-                          numberOfLines={1}
-                          style={styles.imageSettingLabel}
-                        >
-                          {label}
-                        </Text>
-                        <View style={styles.imageSettingButtons}>
-                          <Pressable
-                            accessibilityRole="button"
-                            accessibilityLabel={`Choisir une image pour ${label}`}
-                            disabled={isSavingSettings}
-                            onPress={() => pickImageForFace(face)}
-                            style={({ pressed }) => [
-                              styles.smallActionButton,
-                              pressed ? styles.smallActionButtonPressed : null,
-                              isSavingSettings ? styles.smallActionButtonDisabled : null,
-                            ]}
-                          >
-                            <Text style={styles.smallActionButtonText}>Image</Text>
-                          </Pressable>
-                          <Pressable
-                            accessibilityRole="button"
-                            accessibilityLabel={`Retirer l’image de ${label}`}
-                            disabled={!imageUri || isSavingSettings}
-                            onPress={() =>
-                              setDraftImages((images) => ({
-                                ...images,
-                                [face]: undefined,
-                              }))
-                            }
-                            style={({ pressed }) => [
-                              styles.smallActionButton,
-                              pressed && imageUri
-                                ? styles.smallActionButtonPressed
-                                : null,
-                              !imageUri || isSavingSettings
-                                ? styles.smallActionButtonDisabled
-                                : null,
-                            ]}
-                          >
-                            <Text style={styles.smallActionButtonText}>Retirer</Text>
-                          </Pressable>
+                          <View style={styles.imageSettingButtons}>
+                            <Pressable
+                              accessibilityRole="button"
+                              accessibilityLabel={`Choisir une image pour ${label}`}
+                              disabled={isSavingSettings}
+                              onPress={() => pickImageForFace(face)}
+                              style={({ pressed }) => [
+                                styles.smallActionButton,
+                                pressed ? styles.smallActionButtonPressed : null,
+                                isSavingSettings ? styles.smallActionButtonDisabled : null,
+                              ]}
+                            >
+                              <Text style={styles.smallActionButtonText}>Image</Text>
+                            </Pressable>
+                            <Pressable
+                              accessibilityRole="button"
+                              accessibilityLabel={`Retirer l’image de ${label}`}
+                              disabled={!imageUri || isSavingSettings}
+                              onPress={() =>
+                                setDraftImages((images) => ({
+                                  ...images,
+                                  [face]: undefined,
+                                }))
+                              }
+                              style={({ pressed }) => [
+                                styles.smallActionButton,
+                                pressed && imageUri
+                                  ? styles.smallActionButtonPressed
+                                  : null,
+                                !imageUri || isSavingSettings
+                                  ? styles.smallActionButtonDisabled
+                                  : null,
+                              ]}
+                            >
+                              <Text style={styles.smallActionButtonText}>Retirer</Text>
+                            </Pressable>
+                          </View>
                         </View>
                       </View>
-                    </View>
-                  );
-                })}
-              </View>
+                    );
+                  })}
+                </View>
+              </ScrollView>
 
               <View style={styles.modalActions}>
                 <Pressable
@@ -866,14 +898,12 @@ function CoinSide({
   face,
   imageUri,
   innerSize,
-  isBack,
   label,
   size,
 }: {
   face: CoinFace;
   imageUri?: string;
   innerSize: number;
-  isBack?: boolean;
   label: string;
   size: number;
 }) {
@@ -884,7 +914,6 @@ function CoinSide({
       style={[
         styles.coinSide,
         face === 'pile' ? styles.coinPile : styles.coinFace,
-        isBack ? styles.coinBack : null,
         {
           borderRadius: size / 2,
         },
@@ -1031,7 +1060,6 @@ const styles = StyleSheet.create({
   },
   coinSide: {
     alignItems: 'center',
-    backfaceVisibility: 'hidden',
     borderColor: 'rgba(23, 32, 42, 0.12)',
     borderWidth: 1,
     bottom: 0,
@@ -1056,9 +1084,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-  },
-  coinBack: {
-    transform: [{ rotateY: '180deg' }],
   },
   coinPile: {
     backgroundColor: '#E8B449',
@@ -1377,6 +1402,7 @@ const styles = StyleSheet.create({
   modalPanel: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
+    maxHeight: '88%',
     maxWidth: 420,
     padding: 22,
     width: '100%',
@@ -1417,6 +1443,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     minHeight: 50,
     paddingHorizontal: 13,
+  },
+  settingsScroll: {
+    marginHorizontal: -2,
+  },
+  settingsScrollContent: {
+    paddingHorizontal: 2,
+    paddingBottom: 4,
   },
   imageSettings: {
     gap: 10,
