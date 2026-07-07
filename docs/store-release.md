@@ -14,6 +14,8 @@ Ce document sert de base pour publier Azar sur Google Play et Apple App Store. I
   - iOS : `com.keticwork.azar`
   - Android : `com.keticwork.azar`
 - Privacy policy publique : https://keticwork.github.io/azar/privacy-policy.html
+- Assistance publique : https://keticwork.github.io/azar/support.html
+- Kit textes/images stores : `store-kit/`
 - Aucun compte utilisateur.
 - Aucune publicite.
 - Aucun analytics.
@@ -175,6 +177,22 @@ npm run submit:ios
 ```
 
 EAS Submit envoie le build vers App Store Connect/TestFlight. Il faut ensuite terminer la fiche dans App Store Connect et envoyer a App Review.
+
+Si le code ou les visuels changent pendant qu'un build est en preparation, annuler le build avec `Ctrl+C`, verifier le projet, commit/push, puis relancer `npm run build:ios`. Ne pas envoyer a Apple une build que l'on sait deja depassee.
+
+Reponses conseillees pendant les credentials iOS de production :
+
+- `Reuse this distribution certificate?` : `yes`, si le certificat est deja lie a `@ketic/azar`.
+- `Generate a new Apple Provisioning Profile?` : `yes`, si EAS n'a pas encore de profil App Store valide pour `com.keticwork.azar`.
+- Laisser EAS gerer les credentials distants.
+
+Dans App Store Connect, pour la V1 :
+
+- `Connexion requise` : non, decocher la case.
+- `URL de l'assistance` : `https://keticwork.github.io/azar/support.html`
+- `URL marketing` : laisser vide.
+- `UGS / SKU` : `com.keticwork.azar`
+- Captures iPhone : utiliser de preference des captures reelles de l'app ; des visuels de secours sont disponibles dans `store-kit/images/apple-app-store/`.
 
 ## Google Play - fiche conseillee
 

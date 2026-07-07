@@ -63,10 +63,6 @@ function normalizeLabel(value: string, fallback: string) {
   return normalized || fallback;
 }
 
-function getCoinInitial(label: string) {
-  return label.trim().slice(0, 2).toUpperCase() || '?';
-}
-
 function getFaceFromAngle(angle: number): CoinFace {
   const normalizedAngle = ((angle % 360) + 360) % 360;
 
@@ -751,8 +747,13 @@ export default function App() {
                               style={styles.imageSettingPreviewImage}
                             />
                           ) : (
-                            <Text style={styles.imageSettingPreviewText}>
-                              {getCoinInitial(label)}
+                            <Text
+                              adjustsFontSizeToFit
+                              minimumFontScale={0.55}
+                              numberOfLines={1}
+                              style={styles.imageSettingPreviewText}
+                            >
+                              {label}
                             </Text>
                           )}
                         </View>
@@ -947,8 +948,6 @@ function CoinSide({
   label: string;
   size: number;
 }) {
-  const initial = getCoinInitial(label);
-
   return (
     <View
       style={[
@@ -987,23 +986,12 @@ function CoinSide({
         >
           <Text
             adjustsFontSizeToFit
-            numberOfLines={1}
-            style={[
-              styles.coinMark,
-              imageUri ? styles.coinMarkOnImage : null,
-              { fontSize: size * 0.26 },
-            ]}
-          >
-            {initial}
-          </Text>
-          <Text
-            adjustsFontSizeToFit
             minimumFontScale={0.62}
-            numberOfLines={1}
+            numberOfLines={2}
             style={[
               styles.coinLabel,
               imageUri ? styles.coinLabelOnImage : null,
-              { fontSize: size * 0.085 },
+              { fontSize: size * 0.155 },
             ]}
           >
             {label}
@@ -1168,25 +1156,13 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-28deg' }],
     width: '18%',
   },
-  coinMark: {
-    color: '#17202A',
-    fontSize: 72,
-    fontWeight: '900',
-    letterSpacing: 0,
-    lineHeight: 78,
-  },
-  coinMarkOnImage: {
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.32)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 5,
-  },
   coinLabel: {
     color: '#17202A',
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 34,
+    fontWeight: '900',
     letterSpacing: 0,
-    marginTop: 2,
+    lineHeight: 38,
+    textAlign: 'center',
   },
   coinLabelOnImage: {
     color: '#FFFFFF',
@@ -1534,9 +1510,11 @@ const styles = StyleSheet.create({
   },
   imageSettingPreviewText: {
     color: '#17202A',
-    fontSize: 19,
+    fontSize: 12,
     fontWeight: '900',
     letterSpacing: 0,
+    paddingHorizontal: 5,
+    textAlign: 'center',
   },
   imageSettingActions: {
     flex: 1,
