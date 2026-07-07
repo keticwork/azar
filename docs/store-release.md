@@ -54,6 +54,8 @@ npm run build:preview:android
 
 Resultat attendu : EAS fournit une URL pour telecharger un APK installable sur Android.
 
+Ce lien est un artefact de test interne. Il expire apres quelques jours et ne doit pas etre utilise comme lien public sur un site web. Le lien public durable viendra de Google Play apres publication.
+
 Si EAS demande :
 
 ```txt
@@ -72,6 +74,15 @@ A verifier sur telephone Android :
 - bouton `Defaut` retire les images et remet les libelles ;
 - volet confidentialite lisible ;
 - pas de crash.
+
+Si la page Expo reste bloquee sur l'installation :
+
+- ouvrir le fichier APK depuis l'application `Telechargements`, `Files` ou `Mes fichiers` du telephone ;
+- autoriser temporairement l'installation depuis Chrome/le navigateur si Android le demande ;
+- verifier si `Azar` est deja present dans la liste des applications ;
+- desinstaller l'ancienne version d'Azar si elle existe, puis relancer l'installation ;
+- retelecharger l'APK si le fichier semble incomplet ;
+- redemarrer le telephone si l'installateur Android reste bloque.
 
 ## Etape 4 - Build preview iOS
 
