@@ -178,6 +178,16 @@ npm run submit:ios
 
 EAS Submit envoie le build vers App Store Connect/TestFlight. Il faut ensuite terminer la fiche dans App Store Connect et envoyer a App Review.
 
+Validation Azar du 7 juillet 2026 :
+
+- Build iOS production termine avec succes :
+  - URL EAS : https://expo.dev/accounts/ketic/projects/azar/builds/e1f1cc2f-a51b-41c1-82ba-a7e91ababc8f
+  - Artefact IPA : https://expo.dev/artifacts/eas/QaKlN9jDZgp62_Xmge0Q4jN-77V1sNeP8pvyaJhbmgo.ipa
+  - Commit : `e9b19d8`
+  - Profil : `production`
+  - Version : `1.0.0 (2)`
+  - Build number iOS augmente automatiquement de `1` a `2` par EAS.
+
 Si le code ou les visuels changent pendant qu'un build est en preparation, annuler le build avec `Ctrl+C`, verifier le projet, commit/push, puis relancer `npm run build:ios`. Ne pas envoyer a Apple une build que l'on sait deja depassee.
 
 Reponses conseillees pendant les credentials iOS de production :
@@ -314,6 +324,16 @@ Generate a new Apple Provisioning Profile?
 Reponse : `yes` si EAS n'a pas encore de provisioning profile App Store valide pour `com.keticwork.azar`.
 
 Pourquoi : un build production App Store a besoin d'un profil de signature different du profil ad hoc/preview.
+
+Message :
+
+```txt
+Bumping expo.ios.buildNumber from 1 to 2
+```
+
+Action : laisser faire EAS, puis committer `app.json` apres le build si le fichier a ete modifie.
+
+Pourquoi : Apple demande un build number unique et croissant pour chaque binaire envoye a App Store Connect.
 
 Question App Store Connect :
 
