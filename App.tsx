@@ -50,6 +50,13 @@ type StoredCoinSettings = {
   images?: CoinImages;
 };
 
+type CoinPose = {
+  edgeOpacity: number;
+  scaleX: number;
+  scaleY: number;
+  tilt: number;
+};
+
 function normalizeLabel(value: string, fallback: string) {
   const normalized = value.trim().replace(/\s+/g, ' ');
 
@@ -58,6 +65,24 @@ function normalizeLabel(value: string, fallback: string) {
 
 function getCoinInitial(label: string) {
   return label.trim().slice(0, 2).toUpperCase() || '?';
+}
+
+function getFaceFromAngle(angle: number): CoinFace {
+  const normalizedAngle = ((angle % 360) + 360) % 360;
+
+  return normalizedAngle <= 90 || normalizedAngle >= 270 ? 'pile' : 'face';
+}
+
+function getCoinPoseFromAngle(angle: number): CoinPose {
+  const radians = (angle * Math.PI) / 180;
+  const sideAmount = Math.abs(Math.cos(radians));
+
+  return {
+    edgeOpacity: 1 - sideAmount,
+    scaleX: Math.max(0.1, sideAmount),
+    scaleY: 1 + (1 - sideAmount) * 0.045,
+    tilt: Math.sin(radians) * 4,
+  };
 }
 
 function getCoinImageDirectory() {
@@ -156,9 +181,10 @@ export default function App() {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [coinPose, setCoinPose] = useState<CoinPose>(getCoinPoseFromAngle(0));
   const [visibleCoinFace, setVisibleCoinFace] = useState<CoinFace>('pile');
   const flipProgress = useRef(new Animated.Value(0)).current;
-  const flipInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const flipProgressListener = useRef<string | null>(null);
   const isCompactHeight = height < 700;
   const coinSize = Math.min(isCompactHeight ? 192 : 224, width - 78);
   const coinInnerSize = Math.max(coinSize - 40, 140);
@@ -214,11 +240,11 @@ export default function App() {
 
   useEffect(() => {
     return () => {
-      if (flipInterval.current) {
-        clearInterval(flipInterval.current);
+      if (flipProgressListener.current) {
+        flipProgress.removeListener(flipProgressListener.current);
       }
     };
-  }, []);
+  }, [flipProgress]);
 
   const stats = useMemo(() => {
     let pile = 0;
@@ -259,21 +285,6 @@ export default function App() {
     };
   }, [history]);
 
-  const coinRotation = flipProgress.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '720deg'],
-  });
-
-  const coinScaleX = flipProgress.interpolate({
-    inputRange: [0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72, 0.84, 1],
-    outputRange: [1, 0.18, 1, 0.18, 1, 0.18, 1, 0.18, 1],
-  });
-
-  const coinScaleY = flipProgress.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.04, 1],
-  });
-
   const flipCoin = () => {
     if (isFlipping) {
       return;
@@ -281,28 +292,35 @@ export default function App() {
 
     const nextFace: CoinFace = Math.random() < 0.5 ? 'pile' : 'face';
     const activePrediction = selectedPrediction;
+    const startAngle = currentFace === 'pile' ? 0 : 180;
+    const targetAngle = nextFace === 'pile' ? 0 : 180;
+    const deltaToTarget = (targetAngle - startAngle + 360) % 360;
+    const totalAngle = 1440 + deltaToTarget;
+
     setIsFlipping(true);
     setVisibleCoinFace(currentFace);
     Vibration.vibrate(16);
     flipProgress.setValue(0);
 
-    if (flipInterval.current) {
-      clearInterval(flipInterval.current);
+    if (flipProgressListener.current) {
+      flipProgress.removeListener(flipProgressListener.current);
     }
 
-    flipInterval.current = setInterval(() => {
-      setVisibleCoinFace((face) => (face === 'pile' ? 'face' : 'pile'));
-    }, 96);
+    flipProgressListener.current = flipProgress.addListener(({ value }) => {
+      const angle = startAngle + totalAngle * value;
+      setVisibleCoinFace(getFaceFromAngle(angle));
+      setCoinPose(getCoinPoseFromAngle(angle));
+    });
 
     Animated.timing(flipProgress, {
       toValue: 1,
-      duration: 960,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
+      duration: 1180,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: false,
     }).start(({ finished }) => {
-      if (flipInterval.current) {
-        clearInterval(flipInterval.current);
-        flipInterval.current = null;
+      if (flipProgressListener.current) {
+        flipProgress.removeListener(flipProgressListener.current);
+        flipProgressListener.current = null;
       }
 
       if (!finished) {
@@ -312,6 +330,7 @@ export default function App() {
 
       setCurrentFace(nextFace);
       setVisibleCoinFace(nextFace);
+      setCoinPose(getCoinPoseFromAngle(targetAngle));
       setHistory((items) => [
         { id: Date.now(), face: nextFace, prediction: activePrediction },
         ...items,
@@ -323,6 +342,7 @@ export default function App() {
   const resetSession = () => {
     setCurrentFace('pile');
     setVisibleCoinFace('pile');
+    setCoinPose(getCoinPoseFromAngle(0));
     setHistory([]);
     setSelectedPrediction(null);
     flipProgress.setValue(0);
@@ -337,8 +357,6 @@ export default function App() {
   const latestPredictionWon = latestPrediction
     ? latestPrediction.prediction === latestPrediction.face
     : false;
-  const resultText = isFlipping ? '...' : faceLabels[currentFace];
-
   const openSettings = () => {
     setDraftLabels(faceLabels);
     setDraftImages(coinImages);
@@ -386,24 +404,19 @@ export default function App() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      base64: true,
+      allowsEditing: false,
+      base64: false,
       mediaTypes: ['images'],
-      quality: 0.58,
+      quality: 0.82,
       selectionLimit: 1,
     });
 
     const asset = result.canceled ? null : result.assets[0];
 
     if (asset?.uri) {
-      const imageUri = asset.base64
-        ? `data:image/jpeg;base64,${asset.base64}`
-        : asset.uri;
-
       setDraftImages((images) => ({
         ...images,
-        [face]: imageUri,
+        [face]: asset.uri,
       }));
     }
   };
@@ -431,7 +444,7 @@ export default function App() {
               <View style={styles.headerActions}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Personnaliser les libellés de la pièce"
+                  accessibilityLabel="Personnaliser la pièce"
                   onPress={openSettings}
                   style={({ pressed }) => [
                     styles.iconButton,
@@ -466,14 +479,24 @@ export default function App() {
                   height: coinSize,
                   transform: [
                     { perspective: 900 },
-                    { rotateZ: coinRotation },
-                    { scaleX: coinScaleX },
-                    { scaleY: coinScaleY },
+                    { rotateZ: `${coinPose.tilt}deg` },
+                    { scaleX: coinPose.scaleX },
+                    { scaleY: coinPose.scaleY },
                   ],
                   width: coinSize,
                 },
               ]}
             >
+              <View
+                pointerEvents="none"
+                style={[
+                  styles.coinEdge,
+                  {
+                    borderRadius: coinSize / 2,
+                    opacity: coinPose.edgeOpacity,
+                  },
+                ]}
+              />
               <CoinSide
                 face={visibleCoinFace}
                 imageUri={coinImages[visibleCoinFace]}
@@ -1057,6 +1080,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 28,
     width: 224,
+  },
+  coinEdge: {
+    backgroundColor: '#B98222',
+    borderColor: 'rgba(255, 255, 255, 0.28)',
+    borderWidth: 2,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    transform: [{ scaleX: 0.62 }],
   },
   coinSide: {
     alignItems: 'center',
