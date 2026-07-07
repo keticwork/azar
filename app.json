@@ -26,7 +26,7 @@
     "ios": {
       "bundleIdentifier": "com.keticwork.azar",
       "buildNumber": "1",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
