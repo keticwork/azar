@@ -194,6 +194,11 @@ Validation Azar du 7 juillet 2026 :
   - Build soumis : `e1f1cc2f-a51b-41c1-82ba-a7e91ababc8f`
   - Build visible dans App Store Connect > TestFlight > iOS > Version `1.0.0`, build `2`.
   - Etat observe dans TestFlight : `Pret a soumettre`.
+- TestFlight valide le 8 juillet 2026 :
+  - invitation recue par e-mail ;
+  - code d'invitation accepte dans l'app TestFlight ;
+  - remplacement de l'ancien build Azar installe sur l'iPhone confirme ;
+  - lancement pile ou face fonctionne comme sur le build preview.
 
 Si le code ou les visuels changent pendant qu'un build est en preparation, annuler le build avec `Ctrl+C`, verifier le projet, commit/push, puis relancer `npm run build:ios`. Ne pas envoyer a Apple une build que l'on sait deja depassee.
 
@@ -401,6 +406,26 @@ Submitted your app to Apple App Store Connect!
 ```
 
 Action : aller dans App Store Connect > app > TestFlight. Le build peut ensuite prendre quelques minutes avant d'etre visible, mais pour Azar le build `1.0.0 (2)` est apparu dans TestFlight.
+
+Message TestFlight sur iPhone :
+
+```txt
+Cette app est deja installee, voulez-vous remplacer la version actuelle?
+```
+
+Reponse : `Remplacer`.
+
+Pourquoi : l'iPhone peut encore avoir le build preview/ad hoc installe. TestFlight doit le remplacer par le build App Store Connect.
+
+Question :
+
+```txt
+Faut-il installer App Store Connect sur iPhone?
+```
+
+Reponse : non obligatoire.
+
+Pourquoi : l'app iPhone App Store Connect sert surtout a consulter rapidement les statuts. Pour remplir la fiche store, les captures, la confidentialite et la soumission, utiliser le site App Store Connect sur Mac.
 
 ### Apple contrats/conformite
 
