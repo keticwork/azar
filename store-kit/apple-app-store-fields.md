@@ -70,3 +70,69 @@ Publication :
 
 - Pour la premiere soumission, choisir "Publier cette version manuellement" si vous voulez verifier la fiche apres approbation.
 - Sinon "Publier automatiquement" publiera des qu'Apple approuve.
+
+## Build selectionne
+
+Build :
+
+- Selectionner le build iOS `1.0.0 (2)`.
+- Extrait d'app / App Clip : `Non`.
+- Game Center : laisser decoche.
+
+Ressources incluses :
+
+- Icone de l'app : fournie par le build.
+
+## Confidentialite de l'app
+
+Politique de confidentialite :
+
+https://keticwork.github.io/azar/privacy-policy.html
+
+URL des choix de confidentialite de l'utilisateur :
+
+Laisser vide pour la V1.
+
+Collecte de donnees :
+
+- Repondre que l'app ne collecte aucune donnee.
+- Tracking : non.
+- Photos / galerie : ne pas declarer comme donnee collectee, car l'image choisie reste sur l'appareil et n'est pas envoyee a un serveur.
+
+## Accessibilite de l'app
+
+Pour la V1, rester prudent : ne pas declarer une fonctionnalite d'accessibilite comme officiellement prise en charge si elle n'a pas ete testee.
+
+Reponse conseillee :
+
+- Cliquer sur "Commencer".
+- Si Apple propose une liste de fonctionnalites prises en charge, ne rien cocher pour la V1, puis enregistrer/publier.
+- Ne pas declarer "Interface sombre" : l'app est forcee en interface claire.
+- Ne pas declarer "Police plus grande" comme support officiel tant qu'on n'a pas teste l'app jusqu'a 200%.
+- Ne pas declarer "VoiceOver" comme support officiel tant qu'on n'a pas fait une passe de test complete avec VoiceOver.
+
+Note : le build contient deja des libelles d'accessibilite sur les boutons principaux, mais on documentera une prise en charge officielle plus tard apres validation dediee.
+
+## Tarifs et disponibilite
+
+Calendrier tarifaire :
+
+- Ajouter la tarification.
+- Prix : gratuit.
+- Date de debut : maintenant / des que disponible.
+
+Disponibilite de l'app :
+
+- Configurer la disponibilite.
+- Pour la V1, tous les pays ou regions peuvent rester selectionnes si la conformite DSA Apple ne bloque pas.
+- Ne pas activer de precommande.
+
+Apps iPhone/iPad sur Mac Apple Silicon :
+
+- Azar n'est pas prevu pour Mac dans cette V1.
+- Si Apple propose l'option, laisser desactivee ou ne pas ajouter Mac comme plateforme.
+
+Achats integres / abonnements :
+
+- Aucun achat integre.
+- Aucun abonnement.

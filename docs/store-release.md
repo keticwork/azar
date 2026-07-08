@@ -218,6 +218,42 @@ Dans App Store Connect, pour la V1 :
 
 Note : apres `npm run submit:ios`, Expo peut ne montrer que le build dans l'onglet `Builds`. La preuve importante de la soumission est dans `Submissions` cote Expo et surtout dans App Store Connect > TestFlight. Une fois le binaire traite par Apple, continuer la fiche App Store dans App Store Connect.
 
+Validation fiche App Store Connect du 8 juillet 2026 :
+
+- App Store Connect > Distribution > App iOS Version 1.0 enregistree avec succes.
+- Captures iPhone 6,5 pouces ajoutees : 5 captures, 0 apercu video. Les apercus d'app sont optionnels pour Azar V1.
+- Description renseignee depuis `store-kit/apple-app-store-fields.md`.
+- Mots-cles renseignes : `pile ou face,hasard,decision,piece,tirage,outil,choix`.
+- URL d'assistance : `https://keticwork.github.io/azar/support.html`.
+- URL marketing : vide.
+- Copyright : `© 2026 Kevin Pichon`.
+- Build App Store selectionne : `1.0.0 (2)`.
+- Game Center : decoche.
+- Informations de verification :
+  - Connexion requise : decoche.
+  - Contact : Kevin Pichon, telephone professionnel Apple Developer, `keticwork@gmail.com`.
+  - Remarques : app sans compte, images locales uniquement, effacement local possible, pas de publicite, pas d'analytics, pas d'IAP, pas de pari/mise/gain/recompense.
+- Publication de la version : `Publier cette version manuellement`.
+
+Prochaines pages App Store Connect a terminer avant `Ajouter pour verification` :
+
+1. `Confidentialite de l'app`
+   - Politique de confidentialite : `https://keticwork.github.io/azar/privacy-policy.html`
+   - Choix de confidentialite utilisateur : vide.
+   - Donnees collectees : aucune.
+   - Tracking : non.
+2. `Accessibilite de l'app`
+   - Pour la V1, ne pas declarer de fonctionnalite officielle non testee.
+   - Ne rien cocher si Apple propose une liste de fonctionnalites prises en charge.
+   - Ne pas declarer Interface sombre, car `userInterfaceStyle` est `light`.
+3. `Tarifs et disponibilite`
+   - Prix : gratuit.
+   - Disponibilite : tous les pays/regions si Apple ne bloque pas la conformite DSA.
+   - Pas de precommande.
+4. `Classification / age rating`
+   - Repondre selon la V1 : pas de violence, pas de contenu adulte, pas de jeu d'argent, pas de concours, pas de web non filtre, pas de medical.
+5. Revenir sur la version iOS 1.0 et cliquer `Ajouter pour verification` uniquement quand tous les voyants requis sont OK.
+
 ## Journal questions/reponses rencontrees
 
 Cette section garde les prompts reels vus pendant la distribution Azar. Elle servira a produire ensuite un guide general plus digeste pour les prochaines mini-apps.
@@ -468,6 +504,46 @@ Connexion requise dans les informations de verification Apple?
 Reponse : decocher.
 
 Pourquoi : Azar n'a aucun compte ni ecran de connexion.
+
+Question :
+
+```txt
+Apercus d'app 0/3, captures d'ecran 5/10
+```
+
+Reponse : c'est OK.
+
+Pourquoi : les apercus d'app sont des videos optionnelles. Pour Azar V1, des captures d'ecran propres suffisent.
+
+Question :
+
+```txt
+URL de l'assistance sur GitHub Pages
+```
+
+Reponse : utiliser `https://keticwork.github.io/azar/support.html`.
+
+Pourquoi : App Store Connect demande seulement une page d'assistance publique accessible. Il n'est pas obligatoire d'avoir un domaine dedie pour la V1.
+
+Question :
+
+```txt
+Confidentialite de l'app - donnees collectees
+```
+
+Reponse : declarer aucune donnee collectee.
+
+Pourquoi : Azar n'envoie rien a un serveur. Les images choisies dans la galerie restent locales et servent uniquement a afficher la piece sur l'appareil.
+
+Question :
+
+```txt
+Accessibilite de l'app
+```
+
+Reponse : pour la V1, ne pas cocher de fonctionnalite officielle si elle n'a pas ete testee de bout en bout.
+
+Pourquoi : ces informations peuvent etre affichees publiquement sur la fiche App Store. Il vaut mieux etre honnete et ajouter des fonctionnalites d'accessibilite declarees apres une vraie passe de test.
 
 Question :
 
