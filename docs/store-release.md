@@ -1,6 +1,6 @@
 # Azar - checklist distribution stores
 
-Derniere mise a jour : 7 juillet 2026.
+Derniere mise a jour : 8 juillet 2026.
 
 Ce document sert de base pour publier Azar sur Google Play et Apple App Store. Il doit rester aligne avec le comportement reel de l'app.
 
@@ -187,6 +187,13 @@ Validation Azar du 7 juillet 2026 :
   - Profil : `production`
   - Version : `1.0.0 (2)`
   - Build number iOS augmente automatiquement de `1` a `2` par EAS.
+- Soumission iOS vers App Store Connect terminee avec succes le 8 juillet 2026 :
+  - Submission EAS : https://expo.dev/accounts/ketic/projects/azar/submissions/56043e3e-4c70-48be-be7d-e1b9dd9f4b98
+  - ASC App ID : `6788504126`
+  - App Store Connect API Key creee par EAS avec role `APP_MANAGER`.
+  - Build soumis : `e1f1cc2f-a51b-41c1-82ba-a7e91ababc8f`
+  - Build visible dans App Store Connect > TestFlight > iOS > Version `1.0.0`, build `2`.
+  - Etat observe dans TestFlight : `Pret a soumettre`.
 
 Si le code ou les visuels changent pendant qu'un build est en preparation, annuler le build avec `Ctrl+C`, verifier le projet, commit/push, puis relancer `npm run build:ios`. Ne pas envoyer a Apple une build que l'on sait deja depassee.
 
@@ -203,6 +210,8 @@ Dans App Store Connect, pour la V1 :
 - `URL marketing` : laisser vide.
 - `UGS / SKU` : `com.keticwork.azar`
 - Captures iPhone : utiliser de preference des captures reelles de l'app ; des visuels de secours sont disponibles dans `store-kit/images/apple-app-store/`.
+
+Note : apres `npm run submit:ios`, Expo peut ne montrer que le build dans l'onglet `Builds`. La preuve importante de la soumission est dans `Submissions` cote Expo et surtout dans App Store Connect > TestFlight. Une fois le binaire traite par Apple, continuer la fiche App Store dans App Store Connect.
 
 ## Journal questions/reponses rencontrees
 
@@ -354,6 +363,44 @@ Identifiant de lot tres long dans la liste
 Reponse : normal si Apple affiche aussi le nom interne du Bundle ID avant `com.keticwork.azar`.
 
 Point important : si un build est en cours mais que le code doit changer, faire `Ctrl+C`, corriger, verifier, commit/push, puis relancer le build. Ne pas envoyer a Apple un binaire deja obsolete.
+
+Question EAS Submit :
+
+```txt
+Generate a new App Store Connect API Key?
+```
+
+Reponse : `yes` au premier submit iOS.
+
+Pourquoi : EAS Submit utilise cette cle pour uploader le binaire vers App Store Connect. Si EAS indique `Key Source: EAS servers`, ne rien copier manuellement dans `app.json`, `eas.json` ou Apple.
+
+Question EAS Submit :
+
+```txt
+Select role for the generated API key
+```
+
+Reponse conseillee : `APP_MANAGER`.
+
+Pourquoi : c'est le role le moins large qui suffit normalement pour gerer l'app et envoyer le build. Utiliser `ADMIN` seulement si Apple/EAS refuse l'upload avec `APP_MANAGER`.
+
+Message EAS Submit :
+
+```txt
+waiting for an available submitter
+```
+
+Action : attendre.
+
+Pourquoi : ce n'est pas encore la validation Apple. Expo attend une ressource disponible pour uploader le fichier `.ipa` vers App Store Connect.
+
+Message EAS Submit :
+
+```txt
+Submitted your app to Apple App Store Connect!
+```
+
+Action : aller dans App Store Connect > app > TestFlight. Le build peut ensuite prendre quelques minutes avant d'etre visible, mais pour Azar le build `1.0.0 (2)` est apparu dans TestFlight.
 
 ### Apple contrats/conformite
 
