@@ -15,6 +15,18 @@
 
 ## Page version iOS 1.0
 
+Captures iPhone 6,5 pouces :
+
+Ajouter les images du dossier `store-kit/images/apple-app-store/upload-ready-iphone-65-v2/` dans cet ordre :
+
+1. `01-pile-par-defaut.png`
+2. `02-personnalisation-images.png`
+3. `03-resultat-personnalise.png`
+4. `04-statistiques-historique.png`
+5. `05-confidentialite.png`
+
+Ne pas utiliser de capture affichant `TestFlight`, `Expo Go` ou une barre de retour beta. Ne pas utiliser d'image sous licence/marque tierce dans les captures store.
+
 Texte promotionnel : laisser vide pour la V1.
 
 Description :
